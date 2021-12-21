@@ -35,6 +35,16 @@ export class UsersService {
     }
   }
 
+  async findOneByUsername(username: string) {
+    try {
+      const result = await this.userModel.findOne({ username });
+      if (!result) throw new NotFoundException('Could not find user');
+      return result;
+    } catch (e) {
+      throw new NotFoundException('Could not find user');
+    }
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     const existingUser = await this.findOne(id);
     for (const [key, value] of Object.entries(updateUserDto)) {

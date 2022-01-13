@@ -3,7 +3,6 @@ import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controler';
 import { ConfigModule } from '@nestjs/config';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -18,7 +17,6 @@ import { APP_GUARD } from '@nestjs/core';
     UsersModule,
     AuthModule,
   ],
-  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

@@ -1,15 +1,16 @@
 import * as mongoose from 'mongoose';
-import { genSalt, hash, compare } from 'bcrypt';
+import { genSalt, hash } from 'bcrypt';
 
 const SALT_WORK_FACTOR = 10;
 
 export interface User extends mongoose.Document {
-  id: string;
+  _id: string;
   firstName: string;
   lastName: string;
   username: string;
   password: string;
   isActive: boolean;
+  hashedRt?: string;
 }
 
 const UserSchema = new mongoose.Schema<User>({
@@ -18,6 +19,7 @@ const UserSchema = new mongoose.Schema<User>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   isActive: { type: Boolean, required: true },
+  hashedRt: { type: String, required: false },
 });
 
 UserSchema.pre('save', async function save(next) {
@@ -31,11 +33,11 @@ UserSchema.pre('save', async function save(next) {
   }
 });
 
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-  compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
-};
+// UserSchema.methods.comparePassword = function (candidatePassword, cb) {
+//   compare(candidatePassword, this.password, function (err, isMatch) {
+//     if (err) return cb(err);
+//     cb(null, isMatch);
+//   });
+// };
 
 export { UserSchema };

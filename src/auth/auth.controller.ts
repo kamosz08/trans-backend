@@ -1,9 +1,10 @@
 import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Public } from 'src/public.decorator';
+import { Public } from 'src/common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
+import { JwtRtAuthGuard } from 'src/common/guards/jwt-rt-guard.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +29,7 @@ export class AuthController {
   }
 
   @Public()
-  @UseGuards(AuthGuard('jwt-refresh'))
+  @UseGuards(JwtRtAuthGuard)
   @Post('refresh')
   refreshTokens(@Request() req) {
     return this.authService.refreshTokens(req.user);

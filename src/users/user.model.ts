@@ -7,14 +7,14 @@ export interface User extends mongoose.Document {
   _id: string;
   firstName: string;
   lastName: string;
-  username: string;
+  email: string;
   password: string;
   isActive: boolean;
   hashedRt?: string;
 }
 
 const UserSchema = new mongoose.Schema<User>({
-  username: { type: String, required: true, index: { unique: true } },
+  email: { type: String, required: true, index: { unique: true } },
   password: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },

@@ -16,12 +16,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOneByUsername(username);
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
       const isPasswordMatch = await compare(pass, user.password);
-      if (isPasswordMatch) return { username: user.username, userId: user._id };
+      if (isPasswordMatch) return { email: user.email, userId: user._id };
       return null;
     }
     return null;
@@ -31,14 +31,14 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  async getTokens(username: string, userId: string) {
+  async getTokens(email: string, userId: string) {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
-        { username: username, sub: userId },
+        { email: email, sub: userId },
         { expiresIn: '1h', secret: process.env.SECRET },
       ),
       this.jwtService.signAsync(
-        { username: username, sub: userId },
+        { email: email, sub: userId },
         { expiresIn: '10h', secret: process.env.SECRET_RT },
       ),
     ]);
@@ -60,20 +60,20 @@ export class AuthService {
       isActive: typeof user.isActive === 'undefined' ? true : user.isActive,
     });
     const result = await newUser.save();
-    const tokens = await this.getTokens(result.username, result._id);
+    const tokens = await this.getTokens(result.email, result._id);
     await this.updateRtHash(result.id, tokens.refresh_token);
 
     return tokens;
   }
 
-  async login(user: { username: string; userId: string }) {
-    const tokens = await this.getTokens(user.username, user.userId);
+  async login(user: { email: string; userId: string }) {
+    const tokens = await this.getTokens(user.email, user.userId);
     await this.updateRtHash(user.userId, tokens.refresh_token);
 
     return tokens;
   }
 
-  async logout(user: { username: string; userId: string }) {
+  async logout(user: { email: string; userId: string }) {
     await this.userModel.updateOne({ _id: user.userId }, { hashedRt: null });
 
     return true;
@@ -83,7 +83,7 @@ export class AuthService {
     userId,
     refreshToken: rt,
   }: {
-    username: string;
+    email: string;
     userId: string;
     refreshToken: string;
   }) {
@@ -94,7 +94,7 @@ export class AuthService {
     const rtMatches = await bcrypt.compare(rt, user.hashedRt);
     if (!rtMatches) throw new UnauthorizedException();
 
-    const tokens = await this.getTokens(user.username, user._id);
+    const tokens = await this.getTokens(user.email, user._id);
     await this.updateRtHash(user._id, tokens.refresh_token);
     return tokens;
   }

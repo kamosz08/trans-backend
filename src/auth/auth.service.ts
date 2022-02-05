@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -55,15 +60,24 @@ export class AuthService {
   }
 
   async register(user: CreateUserDto) {
-    const newUser = new this.userModel({
-      ...user,
-      isActive: typeof user.isActive === 'undefined' ? true : user.isActive,
-    });
-    const result = await newUser.save();
-    const tokens = await this.getTokens(result.email, result._id);
-    await this.updateRtHash(result.id, tokens.refresh_token);
+    try {
+      const newUser = new this.userModel({
+        ...user,
+        isActive: typeof user.isActive === 'undefined' ? true : user.isActive,
+      });
+      const result = await newUser.save();
+      const tokens = await this.getTokens(result.email, result._id);
+      await this.updateRtHash(result.id, tokens.refresh_token);
 
-    return tokens;
+      return tokens;
+    } catch (e) {
+      if (e.name === 'MongoError') {
+        throw new HttpException(
+          'User with this email already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else throw new Error();
+    }
   }
 
   async login(user: { email: string; userId: string }) {

@@ -1,48 +1,42 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  Param,
   Post,
-  Put,
-  Res,
+  Body,
+  Patch,
+  Param,
+  Delete,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
+import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Post()
+  create(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto);
+  }
 
   @Get()
-  async findAll(@Res() request: Request) {
+  findAll() {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param() params) {
-    console.log(params.id);
-
-    return 'One order';
+  findOne(@Param('id') id: string) {
+    return this.ordersService.findOne(id);
   }
 
-  @Post()
-  @HttpCode(204)
-  async create(@Body() createOrderDto: CreateOrderDto) {
-    this.ordersService.create(createOrderDto);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updaterderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.ordersService.update(id, updateOrderDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return `This action removes a #${id} order`;
+    return this.ordersService.remove(id);
   }
 }

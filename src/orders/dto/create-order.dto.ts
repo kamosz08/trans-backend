@@ -1,5 +1,6 @@
 export class CreateOrderDto {
-  from: string;
-  to: string;
-  distance: number;
+  price: number;
+  name: string;
+  driverId: string;
+  vehicleId: string;
 }

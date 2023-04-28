@@ -1,6 +1,6 @@
 # Orders app
 
-This is pretty basic fullstack CRUD application I have created to try out some tools, libs and solutions. I didn't realy had an idea for something I could deploy and share with the world, this project was all about improving skills, not about the final product.
+Fullstack CRUD application to try out some tools, libs and solutions. This project was all about improving skills, not about the final product.
 
 # Most important tech details
 
